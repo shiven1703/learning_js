@@ -26,7 +26,7 @@
   <div class="container">
     <h1>Add Book</h1>
     <div id="status">
-      <h6 class="error">failed</h6>
+      
     </div>
     <form id="book-form">
       <div>
@@ -45,7 +45,7 @@
         <input type="submit" value="Submit" class="u-full-width">
       </div>
     </form>
-    <table class="u-full-width">
+    <table class="u-full-width" id="bookTable">
       <thead>
         <tr>
           <th>Title</th>
@@ -54,7 +54,14 @@
           <th></th>
         </tr>
       </thead>
-      <tbody id="book-list"></tbody>
+      <tbody id="book-list">
+        <!-- <tr>
+          <td>The Book</td>
+          <td>Shivam Patel</td>
+          <td>#44400056</td>
+          <td><button id="removeBook">Delete</button></td>
+        </tr> -->
+      </tbody>
     </table>
   </div>
 
