@@ -12,6 +12,17 @@ class UI {
 
 	constructor(){}
 
+	loadBooks(){
+		this.storage = new LocalStorage();
+		this.books = this.storage.getAllBooks();
+		if(this.books != null){
+			for(let i=0; i<this.books.length; i++){
+			this.addToList(this.books[i]);
+			}
+		}
+	}
+
+
 	addToList(book){
 		try {
 
@@ -36,14 +47,18 @@ class UI {
 			btn.innerHTML = "Delete";
 			btn.addEventListener('click', function(e){
 				console.log(e.target.parentElement.parentElement.remove());
+				const storage = new LocalStorage();
+				storage.deleteBook(e.target.id.toString());
 				const ui = new UI();
 				ui.updateStatus("fail", "Book deleted");
 			});
 
 			CellButton.appendChild(btn);
+			
 			return "success";
 
 		}catch(e){
+			console.log(e);
 			return "fail";
 		}
 	}
@@ -87,6 +102,44 @@ class UI {
 	}
 }
 
+class LocalStorage{
+
+	constructor(){
+		this.storage = window.localStorage;
+		this.books = [];
+	}
+
+	addBook(book){
+
+		if(this.storage.getItem('books') === null){
+			this.books.push(book);
+			this.storage.setItem('books',JSON.stringify(this.books).toString());	
+		}else{
+			this.books = JSON.parse(this.storage.getItem('books'));
+			this.books.push(book);
+			this.storage.setItem('books', JSON.stringify(this.books));
+		}
+
+	}
+
+	deleteBook(isbn){
+		this.books = JSON.parse(this.storage.getItem('books'));
+		for(let i=0; i<this.books.length; i++){
+			if(this.books[i].ISBN === isbn){
+				this.books.splice(i, 1);
+			}
+		}
+		this.storage.setItem('books', JSON.stringify(this.books));
+	}
+
+	getAllBooks(){
+		return JSON.parse(this.storage.getItem('books'));
+	}
+}
+
+// loading books
+const ui = new UI();
+ui.loadBooks();
 
 // fetcing form
 const form = document.querySelector("#book-form");
@@ -102,8 +155,12 @@ form.addEventListener('submit', function(e){
 
 	if(title !== "" && author !== "" && isbn !== ""){
 		const newBook = new Book(title, author, isbn);
-		const status = ui.addToList(newBook);
-		ui.updateStatus(status, "New Book added.");
+		ui.addToList(newBook);
+
+		const storage = new LocalStorage();
+		storage.addBook(newBook);
+		
+		ui.updateStatus("success", "New Book added.");
 		ui.clearForm();
 		
 	}else{
