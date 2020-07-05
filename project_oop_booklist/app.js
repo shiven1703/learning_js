@@ -12,6 +12,7 @@ class UI {
 
 	constructor(){}
 
+	// adding all the books to the list which are saved in localstorage
 	loadBooks(){
 		this.storage = new LocalStorage();
 		this.books = this.storage.getAllBooks();
@@ -22,7 +23,7 @@ class UI {
 		}
 	}
 
-
+	// adding new book
 	addToList(book){
 		try {
 
@@ -62,7 +63,7 @@ class UI {
 			return "fail";
 		}
 	}
-
+	// settings for status
 	updateStatus(status, msg){
 		// get status div
 		const statusDiv = document.querySelector("#status");
@@ -94,7 +95,7 @@ class UI {
 			}, 3000);
 		}
 	}
-
+	// clearing form input field
 	clearForm(){
 		document.querySelector("#title").value = "";
 		document.querySelector("#author").value = "";
@@ -110,11 +111,12 @@ class LocalStorage{
 	}
 
 	addBook(book){
-
+		// checking if books key is in the localstorage or not
 		if(this.storage.getItem('books') === null){
 			this.books.push(book);
 			this.storage.setItem('books',JSON.stringify(this.books).toString());	
 		}else{
+			// pushing new book to existing book json in localstorage
 			this.books = JSON.parse(this.storage.getItem('books'));
 			this.books.push(book);
 			this.storage.setItem('books', JSON.stringify(this.books));
@@ -123,12 +125,14 @@ class LocalStorage{
 	}
 
 	deleteBook(isbn){
+		// delete book from localstorage if it matches with isbn number requested to delete
 		this.books = JSON.parse(this.storage.getItem('books'));
 		for(let i=0; i<this.books.length; i++){
 			if(this.books[i].ISBN === isbn){
 				this.books.splice(i, 1);
 			}
 		}
+		// updating localstorage
 		this.storage.setItem('books', JSON.stringify(this.books));
 	}
 
@@ -152,18 +156,20 @@ form.addEventListener('submit', function(e){
 	let isbn = document.querySelector("#isbn").value;
 
 	const ui = new UI();
-
+	// checking if form is filled or not
 	if(title !== "" && author !== "" && isbn !== ""){
+		// creating book obj
 		const newBook = new Book(title, author, isbn);
 		ui.addToList(newBook);
-
+		// adding obj to local storage
 		const storage = new LocalStorage();
 		storage.addBook(newBook);
-		
+		// sending success notification
 		ui.updateStatus("success", "New Book added.");
 		ui.clearForm();
 		
 	}else{
+		// sending fail notification
 		ui.updateStatus("fail", "Please fill the form.")
 	}
 
