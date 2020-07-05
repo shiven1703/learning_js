@@ -5,9 +5,14 @@ class Book {
 		this.author = author;
 		this.ISBN = ISBN;
 	}
+}
 
 
-	addToList(){
+class UI {
+
+	constructor(){}
+
+	addToList(book){
 		try {
 
 			// selecing table
@@ -16,94 +21,72 @@ class Book {
 			const newRow = table.insertRow(-1);
 			// new title cell
 			const CellTitle = newRow.insertCell(0);
-			CellTitle.innerHTML = this.title;
+			CellTitle.innerHTML = book.title;
 			// new author cell
 			const CellAuthor = newRow.insertCell(1);
-			CellAuthor.innerHTML = this.author;
+			CellAuthor.innerHTML = book.author;
 			// new ISBN cell
 			const CellISBN = newRow.insertCell(2);
-			CellISBN.innerHTML = this.ISBN;
+			CellISBN.innerHTML = book.ISBN;
 			// delete btn
 			const CellButton = newRow.insertCell(3);
 			// event for deleing click row
 			const btn = document.createElement("button");
-			btn.id = this.ISBN;
+			btn.id = book.ISBN;
 			btn.innerHTML = "Delete";
 			btn.addEventListener('click', function(e){
 				console.log(e.target.parentElement.parentElement.remove());
-				updateStatus(-1);
+				const ui = new UI();
+				ui.updateStatus("fail", "Book deleted");
 			});
 
 			CellButton.appendChild(btn);
-			return 1;
+			return "success";
 
 		}catch(e){
-			return 2;
+			return "fail";
 		}
 	}
 
-	
+	updateStatus(status, msg){
+		// get status div
+		const statusDiv = document.querySelector("#status");
 
-}
+		if(status === "success"){
+			// creating succes tag
+			const statusTag = document.createElement('h6');
+			statusTag.setAttribute('class', 'success');
+			statusTag.setAttribute('id', 'successTag');
+			statusTag.innerHTML = msg;
+			statusDiv.appendChild(statusTag);
 
+			// deleting tag after 3 sec 
+			setTimeout(function(){
+				document.querySelector("#successTag").remove();
+			}, 3000);
 
-function updateStatus(status){
-	// get status div
-	const statusDiv = document.querySelector("#status");
+		}else if(status == "fail"){
+			// creating error tag
+			const statusTag = document.createElement('h6');
+			statusTag.setAttribute('class', 'error');
+			statusTag.setAttribute('id', 'errorTag');
+			statusTag.innerHTML = msg;
+			statusDiv.appendChild(statusTag);
 
-	if(status === 1){
-		// creating succes tag
-		const statusTag = document.createElement('h6');
-		statusTag.setAttribute('class', 'success');
-		statusTag.setAttribute('id', 'successTag');
-		statusTag.innerHTML = "Book added.";
-		statusDiv.appendChild(statusTag);
+			// deleting tag after 3 sec
+			setTimeout(function(){
+				document.querySelector("#errorTag").remove();
+			}, 3000);
+		}
+	}
 
-		// deleting tag after 3 sec 
-		setTimeout(function(){
-			document.querySelector("#successTag").remove();
-		}, 3000);
-
-	}else if(status == 0){
-		// creating error tag
-		const statusTag = document.createElement('h6');
-		statusTag.setAttribute('class', 'error');
-		statusTag.setAttribute('id', 'errorTag');
-		statusTag.innerHTML = "Please fill up all details.";
-		statusDiv.appendChild(statusTag);
-
-		// deleting tag after 3 sec
-		setTimeout(function(){
-			document.querySelector("#errorTag").remove();
-		}, 3000);
-
-	}else if(status == -1){
-		// creating error tag
-		const statusTag = document.createElement('h6');
-		statusTag.setAttribute('class', 'error');
-		statusTag.setAttribute('id', 'errorTag');
-		statusTag.innerHTML = "Book Deleted.";
-		statusDiv.appendChild(statusTag);
-
-		// deleting tag after 3 sec
-		setTimeout(function(){
-			document.querySelector("#errorTag").remove();
-		}, 3000);
-
-	}else{
-		// creating error tag
-		const statusTag = document.createElement('h6');
-		statusTag.setAttribute('class', 'error');
-		statusTag.setAttribute('id', 'errorTag');
-		statusTag.innerHTML = "Error adding Book.";
-		statusDiv.appendChild(statusTag);
-
-		// deleting tag after 3 sec
-		setTimeout(function(){
-			document.querySelector("#errorTag").remove();
-		}, 3000);
+	clearForm(){
+		document.querySelector("#title").value = "";
+		document.querySelector("#author").value = "";
+		document.querySelector("#isbn").value = "";
 	}
 }
+
 
 // fetcing form
 const form = document.querySelector("#book-form");
@@ -111,21 +94,20 @@ const form = document.querySelector("#book-form");
 // set on click listener
 form.addEventListener('submit', function(e){
 
-	let title = document.querySelector("#title");
-	let author = document.querySelector("#author");
-	let isbn = document.querySelector("#isbn");
+	let title = document.querySelector("#title").value;
+	let author = document.querySelector("#author").value;
+	let isbn = document.querySelector("#isbn").value;
+
+	const ui = new UI();
 
 	if(title !== "" && author !== "" && isbn !== ""){
-		const newBook = new Book(title.value, author.value, isbn.value);
-		const status = newBook.addToList();
-		updateStatus(status);
-
-		title.value = "";
-		author.value = "";
-		isbn.value = "";
-
+		const newBook = new Book(title, author, isbn);
+		const status = ui.addToList(newBook);
+		ui.updateStatus(status, "New Book added.");
+		ui.clearForm();
+		
 	}else{
-		updateStatus(0);
+		ui.updateStatus("fail", "Please fill the form.")
 	}
 
 	e.preventDefault();
