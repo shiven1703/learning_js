@@ -14,11 +14,11 @@ class UI {
 
 	// adding all the books to the list which are saved in localstorage
 	loadBooks(){
-		this.storage = new LocalStorage();
+		this.storage = new LocalStorageManager();
 		this.books = this.storage.getAllBooks();
 		if(this.books != null){
 			for(let i=0; i<this.books.length; i++){
-			this.addToList(this.books[i]);
+				this.addToList(this.books[i]);
 			}
 		}
 	}
@@ -48,7 +48,7 @@ class UI {
 			btn.innerHTML = "Delete";
 			btn.addEventListener('click', function(e){
 				console.log(e.target.parentElement.parentElement.remove());
-				const storage = new LocalStorage();
+				const storage = new LocalStorageManager();
 				storage.deleteBook(e.target.id.toString());
 				const ui = new UI();
 				ui.updateStatus("fail", "Book deleted");
@@ -103,7 +103,7 @@ class UI {
 	}
 }
 
-class LocalStorage{
+class LocalStorageManager{
 
 	constructor(){
 		this.storage = window.localStorage;
@@ -162,7 +162,7 @@ form.addEventListener('submit', function(e){
 		const newBook = new Book(title, author, isbn);
 		ui.addToList(newBook);
 		// adding obj to local storage
-		const storage = new LocalStorage();
+		const storage = new LocalStorageManager();
 		storage.addBook(newBook);
 		// sending success notification
 		ui.updateStatus("success", "New Book added.");
